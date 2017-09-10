@@ -5,7 +5,7 @@ var Game=function(){
 	var timeDiv;
 	var scoreDiv;
 	var resultDiv;
-	//
+	//分数
 	var score=0;
 	//矩阵
 	var gameData=[
@@ -224,20 +224,34 @@ var Game=function(){
 	var setTime=function(time){
 		timeDiv.innerHTML=time;
 	}
-	//
+	//加分
 	var addScore=function(line){
 		var s=0;
 		s=line*10;
 		score=score+s;
-		scoreDiv.innerHTML+=score;
+		scoreDiv.innerHTML=score;
 	}
-	//
+	//判断双方谁赢
 	var gameover=function(win){
 		if(win){
 			resultDiv.innerHTML='you win !';
 		}else{
 			resultDiv.innerHTML='you lost !';
 		}
+	}
+	//底部增加行
+	var addTailLines=function(lines){
+		for(var i=0;i<gameData.length;i++){
+			gameData[i]=gameData[i+lines.length];
+		}
+		for(var i=0;i<lines.length;i++){
+			gameData[gameData.length-lines.length+i]=lines[i];
+		}
+		cur.origin.x=cur.origin.x-lines.length;
+		if(cur.origin.x<0){
+			cur.origin.x=0;
+		}
+		refreshDiv(gameData,gameDivs);
 	}
 	//初始化
 	var init=function(doms,type,dir){
@@ -268,4 +282,5 @@ var Game=function(){
 	this.setTime=setTime;
 	this.addScore=addScore;
 	this.gameover=gameover;
+	this.addTailLines=addTailLines;
 }
