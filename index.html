@@ -7,6 +7,7 @@
 	</head>
 	<body>
 		<div>请用方向键和空格进行操作： 上->旋转  左->左移 右->右移 下->下移  空格->直达底部</div>
+		<div id="waiting"></div>
 		<div class="square" id="local">
 			<div class=title>我的游戏区域</div>
 			<div class="game" id="local_game"></div>
@@ -41,6 +42,7 @@
 			</div>
 		</div>
 	</body>
+	<script src="socket.io-2.0.3.js"></script>
 	<script src="js/square.js"></script>
 	<script src="js/squareFactory.js"></script>
 	<script src="js/game.js"></script>

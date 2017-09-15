@@ -1,9 +1,15 @@
-var Remote=function(){
+var Remote=function(socket){
 	//游戏对象
 	var game;
 	//绑定按钮事件
 	var bindEvents=function(){
-		document.getElementById('down').onclick=function(){
+		socket.on('init',function(data){
+			start(data.type,data.dir);
+		});
+		socket.on('next',function(data){
+			game.performNext(data.type,data.dir);
+		});
+		/*document.getElementById('down').onclick=function(){
 			game.down();
 		}
 		document.getElementById('left').onclick=function(){
@@ -41,7 +47,8 @@ var Remote=function(){
 		}
 		document.getElementById('addTailLines').onclick=function(){
 			game.addTailLines([[0,1,0,1,0,1,0,1,0,1]]);
-		}
+		}*/
+
 	}
 	//开始
 	var start=function(type,dir){
@@ -55,7 +62,9 @@ var Remote=function(){
 		game=new Game();
 		game.init(doms,type,dir);
 	}
+
+	bindEvents();
 	//导出
-	this.start=start;
-	this.bindEvents=bindEvents;
+	// this.start=start;
+	// this.bindEvents=bindEvents;
 }
