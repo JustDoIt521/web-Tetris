@@ -11,6 +11,19 @@ var socketMap={};
 
 app.listen(PORT);
 
+var bindListener=function(socket,event){
+	socket.on(event,function(data){
+		if(socket.clientNum%2==0){
+			if(socketMap[socket.clientNum-1]){
+				socketMap[socket.clientNum-1].emit(event,data);
+			}
+		}else{
+			if(socketMap[socket.clientNum+1]){
+				socketMap[socket.clientNum+1].emit(event,data);
+			}
+		}
+	});
+}
 io.on('connection',function(socket){
 
 	clientCount=clientCount+1;
@@ -20,28 +33,40 @@ io.on('connection',function(socket){
 	if(clientCount%2==1){
 		socket.emit('waiting','waiting for another person');
 	}else{
-		socket.emit('start');
-		socketMap[(clientCount-1)].emit('start');
+		if(socketMap[clientCount-1]){
+			socket.emit('start');
+			socketMap[(clientCount-1)].emit('start');
+		}else{
+			socket.emit('leave');
+		}
 	}
 
-	socket.on('init',function(data){
-		if(socket.clientNum%2==0){
-			socketMap[socket.clientNum-1].emit('init',data);
-		}else{
-			socketMap[socket.clientNum+1].emit('init',data);
-		}
-	});
-
-	socket.on('next',function(data){
-		if(socket.clientNum%2==0){
-			socketMap[socket.clientNum-1].emit('next',data);
-		}else{
-			socketMap[socket.clientNum+1].emit('next',data);
-		}
-	});
+	
+	bindListener(socket,'init');
+	bindListener(socket,'next');
+	bindListener(socket,'fall');
+	bindListener(socket,'rotate');
+	bindListener(socket,'right');
+	bindListener(socket,'down');
+	bindListener(socket,'left');
+	bindListener(socket,'fixed');
+	bindListener(socket,'line');
+	bindListener(socket,'time');
+	bindListener(socket,'lose');
+	bindListener(socket,'bottomLines');
+	bindListener(socket,'addTailLines');
 
 	socket.on('disconnect',function(){
-
+		if(socket.clientNum%2==0){
+			if(socketMap[socket.clientNum-1]){
+				socketMap[socket.clientNum-1].emit('leave');
+			}
+		}else{
+			if(socketMap[socket.clientNum+1]){
+				socketMap[socket.clientNum+1].emit('leave');
+			}
+		}
+		delete(socketMap[socket.clientNum]);
 	});
 });
 console.log('websocket  listening on  port '+ PORT);

@@ -9,45 +9,37 @@ var Remote=function(socket){
 		socket.on('next',function(data){
 			game.performNext(data.type,data.dir);
 		});
-		/*document.getElementById('down').onclick=function(){
-			game.down();
-		}
-		document.getElementById('left').onclick=function(){
-			game.left();
-		}
-		document.getElementById('right').onclick=function(){
-			game.right();
-		}
-		document.getElementById('rotate').onclick=function(){
+		socket.on('rotate',function(data){
 			game.rotate();
-		}
-		document.getElementById('fall').onclick=function(){
+		});
+		socket.on('left',function(data){
+			game.left();
+		});
+		socket.on('right',function(data){
+			game.right();
+		});
+		socket.on('down',function(data){
+			game.down();
+		});
+		socket.on('fall',function(data){
 			game.fall();
-		}
-		document.getElementById('fixed').onclick=function(){
+		});
+		socket.on('fixed',function(data){
 			game.fixed();
-		}
-		document.getElementById('performNext').onclick=function(){
-			game.performNext(2,2);
-		}
-		document.getElementById('checkClear').onclick=function(){
+		});
+		socket.on('line',function(data){
 			game.checkClear();
-		}
-		document.getElementById('checkGameOver').onclick=function(){
-			game.checkGameOver();
-		}
-		document.getElementById('setTime').onclick=function(){
-			game.setTime(20);
-		}
-		document.getElementById('addScore').onclick=function(){
-			game.addScore(10);
-		}
-		document.getElementById('gameover').onclick=function(){
-			game.gameover(true);
-		}
-		document.getElementById('addTailLines').onclick=function(){
-			game.addTailLines([[0,1,0,1,0,1,0,1,0,1]]);
-		}*/
+			game.addScore(data);
+		});
+		socket.on('time',function(data){
+			game.setTime(data);
+		});
+		socket.on('lose',function(data){
+			game.gameover(false);
+		});
+		socket.on('addTailLines',function(data){
+			game.addTailLines(data);
+		});
 
 	}
 	//开始

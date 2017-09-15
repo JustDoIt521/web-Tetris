@@ -2,7 +2,7 @@ var Local=function(socket){
 	//游戏对象
 	var game
 	//时间间隔
-	var INTERVAL=200;
+	var INTERVAL=2000;
 	//定时器
 	var timer=null;
 	//时间计时器
@@ -14,14 +14,19 @@ var Local=function(socket){
 		document.onkeydown=function(e){
 			if(e.keyCode==38){    //up
 				game.rotate();
+				socket.emit('rotate');
 			} else if(e.keyCode==39){	//right
 				game.right();
+				socket.emit('right');
 			} else if(e.keyCode==40){     //down
 			  	game.down();
+			  	socket.emit('down');
 			} else if(e.keyCode==37){     //left
 				game.left();
+				socket.emit('left');
 			} else if(e.keyCode==32){	 //space
 				game.fall();
+				socket.emit('fall');
 			}	
 		}
 	}
@@ -30,18 +35,31 @@ var Local=function(socket){
 		timeFunc();
 		if(!game.down()){
 			game.fixed();
+			socket.emit('fixed');
 			var line=game.checkClear();
 			if(line!=0){
 				//console.log(line);
 				game.addScore(line);
+				socket.emit('line',line);
+				if(line>1){
+					var bottomLines=generateBottomLine(line);
+					socket.emit('bottomLines',bottomLines);
+				}
 			}
 			var gameOver=game.checkGameOver();
 			if(gameOver){
 				game.gameover(false);
+				document.getElementById('remote_gameover').innerHTML='you win !';
+				socket.emit('lose');
 				stop();
 			}else{
-				game.performNext(generateType(),generateDir());
+				var t=generateType();
+				var d=generateDir();
+				game.performNext(t,d);
+				socket.emit('next',{type:t,dir:d});
 			}
+		}else{
+			socket.emit('down');
 		}
 	}
 	//随机生成干扰行
@@ -63,10 +81,7 @@ var Local=function(socket){
 			timeCount=0;
 			time=time+1;
 			game.setTime(time);
-			if(time%10==0){
-				//console.log(1);
-				game.addTailLines(generateBottomLine(1));
-			}
+			socket.emit('time',time);
 		}
 	}
 	//随机生成一个方块种类
@@ -110,5 +125,18 @@ var Local=function(socket){
 	socket.on('start',function(){
 		document.getElementById('waiting').innerHTML=' ';
 		start();
+	});
+	socket.on('lose',function(){
+		game.gameover(true);
+		stop();
+	});
+	socket.on('leave',function(){
+		document.getElementById('local_gameover').innerHTML='another one has left';
+		document.getElementById('remote_gameover').innerHTML='has left';
+		stop();
+	});
+	socket.on('bottomLines',function(data){
+		game.addTailLines(data);
+		socket.emit('addTailLines',data);
 	});
 }
